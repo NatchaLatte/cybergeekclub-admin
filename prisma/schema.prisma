@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model account {
+  id             String       @id @db.Char(36)
+  email          String       @unique(map: "email") @db.VarChar(255)
+  password       String       @db.VarChar(255)
+  display_name   String       @db.VarChar(255)
+  student_id     String       @unique(map: "student_id") @db.VarChar(255)
+  prefix_th      String       @db.VarChar(255)
+  prefix_en      String       @db.VarChar(255)
+  first_name_th  String       @db.VarChar(255)
+  first_name_en  String       @db.VarChar(255)
+  middle_name_th String       @db.VarChar(255)
+  middle_name_en String       @db.VarChar(255)
+  last_name_th   String       @db.VarChar(255)
+  last_name_en   String       @db.VarChar(255)
+  nickname_th    String       @db.VarChar(255)
+  nickname_en    String       @db.VarChar(255)
+  birthdate      DateTime     @db.Date
+  phone_number   String       @db.VarChar(255)
+  point          Int
+  profile_image  String       @db.VarChar(255)
+  faculty_th     String       @db.VarChar(255)
+  faculty_en     String       @db.VarChar(255)
+  major_th       String       @db.VarChar(255)
+  major_en       String       @db.VarChar(255)
+  code           account_code
+  role           account_role @default(MEMBER)
+  banned         Boolean
+  remaining_time DateTime     @db.DateTime(0)
+  built          DateTime     @default(now()) @db.Timestamp(0)
+}
+
+model account_admin {
+  id           String   @id @db.Char(36)
+  email        String   @unique(map: "email") @db.VarChar(255)
+  password     String   @db.VarChar(255)
+  display_name String   @db.VarChar(255)
+  built        DateTime @default(now()) @db.Timestamp(0)
+}
+
+model activity_calendar {
+  id             String   @id @db.Char(36)
+  particulars_th String   @db.LongText
+  particulars_en String   @db.LongText
+  start_period   DateTime @db.DateTime(0)
+  end_period     DateTime @db.DateTime(0)
+  built          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model budget {
+  id             String          @id @db.Char(36)
+  category       budget_category
+  particulars_th String          @db.LongText
+  particulars_en String          @db.LongText
+  money          Float
+  time_series    DateTime        @db.DateTime(0)
+  built          DateTime        @default(now()) @db.Timestamp(0)
+}
+
+model contact {
+  id           String           @id @db.Char(36)
+  category     contact_category
+  display_name String           @db.VarChar(255)
+  uri          String           @db.MediumText
+  built        DateTime         @default(now()) @db.Timestamp(0)
+}
+
+model corporate_activity {
+  id               String   @id @db.Char(36)
+  published_status Boolean
+  banner_th        String   @db.VarChar(255)
+  banner_en        String   @db.VarChar(255)
+  title_th         String   @db.VarChar(255)
+  title_en         String   @db.VarChar(255)
+  particulars_th   String   @db.LongText
+  particulars_en   String   @db.LongText
+  start_period     DateTime @db.DateTime(0)
+  end_period       DateTime @db.DateTime(0)
+  built            DateTime @default(now()) @db.Timestamp(0)
+}
+
+model document_log {
+  id               String              @id @db.Char(36)
+  account_id       String              @db.Char(36)
+  document         String              @db.VarChar(255)
+  status           document_log_status @default(PENDING)
+  notation         String?             @db.LongText
+  account_admin_id String?             @db.Char(36)
+  built            DateTime            @default(now()) @db.Timestamp(0)
+}
+
+model expenditure {
+  id             String   @id @db.Char(36)
+  particulars_th String   @db.LongText
+  particulars_en String   @db.LongText
+  money          Float
+  time_series    DateTime @db.DateTime(0)
+  built          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model news {
+  id               String   @id @db.Char(36)
+  published_status Boolean
+  banner_th        String   @db.VarChar(255)
+  banner_en        String   @db.VarChar(255)
+  title_th         String   @db.VarChar(255)
+  title_en         String   @db.VarChar(255)
+  particulars_th   String   @db.LongText
+  particulars_en   String   @db.LongText
+  account_admin_id String   @db.Char(36)
+  time_series      DateTime @db.DateTime(0)
+  built            DateTime @default(now()) @db.Timestamp(0)
+}
+
+model one_time_password {
+  email String   @id(length: 36) @db.VarChar(255)
+  otp   String   @db.Char(6)
+  built DateTime @default(now()) @db.Timestamp(0)
+}
+
+model personnel {
+  id             String             @id @db.Char(36)
+  generation     Int
+  category       personnel_category
+  prefix_th      String             @db.VarChar(255)
+  prefix_en      String             @db.VarChar(255)
+  first_name_th  String             @db.VarChar(255)
+  first_name_en  String             @db.VarChar(255)
+  middle_name_th String             @db.VarChar(255)
+  middle_name_en String             @db.VarChar(255)
+  last_name_th   String             @db.VarChar(255)
+  last_name_en   String             @db.VarChar(255)
+  position_th    String             @db.VarChar(255)
+  position_en    String             @db.VarChar(255)
+  profile_image  String             @db.VarChar(255)
+  built          DateTime           @default(now()) @db.Timestamp(0)
+}
+
+model register_corporate_activity {
+  id                    String   @id @db.Char(36)
+  account_id            String   @db.Char(36)
+  corporate_activity_id String   @db.Char(36)
+  built                 DateTime @default(now()) @db.Timestamp(0)
+}
+
+enum budget_category {
+  INCOME
+  SUBSIDY
+}
+
+enum contact_category {
+  FACEBOOK
+  INSTAGRAM
+  YOUTUBE
+  DISCORD
+}
+
+enum personnel_category {
+  MEMBER
+  ADVISOR
+}
+
+enum document_log_status {
+  PENDING
+  APPROVE
+  REJECT
+}
+
+enum account_code {
+  R01
+  R02
+  R03
+  R04
+  R05
+  R06
+  R08
+  R09
+  R10
+  R11
+  R12
+  R13
+  R14
+  R15
+  R16
+  R17
+  R20
+  R21
+  R22
+  R23
+  R24
+  R25
+  R32
+  R33
+  T02
+  T03
+  T04
+  T05
+  T07
+  T08
+  T12
+  T13
+  T14
+  T17
+  T18
+  T19
+  T20
+  T22
+  T23
+  S01
+  S02
+  S03
+  S04
+  S05
+  S06
+  S08
+  S09
+  S10
+  S11
+  S18
+  S19
+  S20
+  G01
+  G02
+  M01
+  M02
+  M03
+  M04
+  M05
+  M07
+  M09
+}
+
+enum account_role {
+  MEMBER
+  CERTIFIED
+}

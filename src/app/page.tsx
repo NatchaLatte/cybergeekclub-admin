@@ -1,113 +1,152 @@
+"use client";
+import Link from "next/link";
 import Image from "next/image";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+import { Account } from "@/utils/custom-type";
+import { IoMail, IoKey } from "react-icons/io5";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { signIn, useSession } from "next-auth/react";
+import mascot from "@/../public/asset/image/logoCGC_TW.png";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+export default function SignIn(): JSX.Element {
+  const [account, setAccount] = useState<Account>({ email: "", password: "" });
+  const [hidePassword, setHidePassword] = useState<boolean>(true);
+  const { status } = useSession();
+  const router = useRouter();
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1500,
+    timerProgressBar: true,
+  });
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, router]);
+
+  const setEmail = (email: ChangeEvent<HTMLInputElement>): void => {
+    setAccount({ ...account, email: email.target.value });
+  };
+
+  const setPassword = (password: ChangeEvent<HTMLInputElement>): void => {
+    setAccount({ ...account, password: password.target.value });
+  };
+
+  const handleSignIn = async (event: FormEvent): Promise<void> => {
+    event.preventDefault();
+    try {
+      if (
+        account.email.trim().length === 0 ||
+        account.password.trim().length === 0
+      ) {
+        Toast.fire({
+          title: "Email or password is blank.",
+          icon: "warning",
+        });
+      } else {
+        const result = await signIn("credentials", {
+          redirect: false,
+          email: account.email.trim(),
+          password: account.password.trim(),
+        });
+        if (result?.error) {
+          Toast.fire({
+            title: "Authentication is not valid.",
+            icon: "error",
+          });
+        } else {
+          Toast.fire({
+            title: "Authentication is valid.",
+            icon: "success",
+          });
+          router.push("/dashboard");
+        }
+      }
+    } catch (error) {
+      Toast.fire({
+        title: "Authentication is not valid.",
+        icon: "error",
+      });
+    }
+  };
+
+  return status === "unauthenticated" ? (
+    <main className="flex flex-row h-screen">
+      <div className="hidden md:flex justify-end items-center flex-1">
+      <Image
+          onDrag={(event) => event.preventDefault()}
+          onDragStart={(event) => event.preventDefault()}
+          onMouseDown={(event) => event.preventDefault()}
+          onContextMenu={(event) => event.preventDefault()}
+          src={mascot}
+          alt="Mascot"
+          className="hidden md:block w-[80%] animate-[matcot_5s_ease-in-out_infinite]"
+          priority={true}
         />
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
+      <div className="flex flex-col justify-center items-center md:items-start flex-1">
+        <form onSubmit={handleSignIn} className="flex flex-col p-5 rounded gap-5">
+          <h2 className="text-nowrap text-5xl md:text-6xl lg:text-7xl leading-relaxed text-center text-primary">
+            Sign In Now!!
           </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+          <label className="input input-bordered input-primary flex gap-2 text-lg">
+            <IoMail className="self-center w-4 h-4 opacity-70" />
+            <input
+              value={account.email}
+              onChange={setEmail}
+              type="text"
+              placeholder="email"
+              className="grow"
+            />
+          </label>
+          <label className="input input-bordered input-primary flex gap-3 text-lg">
+            <IoKey className="self-center w-4 h-4 opacity-70" />
+            <input
+              value={account.password}
+              onChange={setPassword}
+              type={hidePassword ? "password" : "text"}
+              placeholder="password"
+              className="grow"
+            />
+            <button
+              type="button"
+              onClick={() => setHidePassword(!hidePassword)}
+            >
+              {hidePassword ? (
+                <FaEyeSlash className="self-center w-4 h-4 opacity-70" />
+              ) : (
+                <FaEye className="self-center w-4 h-4 opacity-70" />
+              )}
+            </button>
+          </label>
+          <div className="flex flex-col w-full border-opacity-50">
+            <button type="submit" className="text-lg btn btn-primary">
+              Sign In
+            </button>
+            {/* <div className="text-lg divider">OR</div>
+          <Link
+            href="/forgot-password"
+            type="button"
+            className="text-lg btn btn-outline btn-primary"
+          >
+            Forgot password
+          </Link> */}
+          </div>
+        </form>
       </div>
+    </main>
+  ) : (
+    <main className="flex space-x-2 justify-center items-center bg-base-100 h-screen">
+      <span className="sr-only">Loading...</span>
+      <div className="h-8 w-8 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+      <div className="h-8 w-8 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+      <div className="h-8 w-8 bg-primary rounded-full animate-bounce"></div>
     </main>
   );
 }
