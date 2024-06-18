@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -8,7 +8,9 @@ import Swal from "sweetalert2";
 export default function DocumentLog(): JSX.Element {
   const { data, status }: any = useSession();
   const [dataTable, setDataTable] = useState([]);
+  const [dataTableSearch, setDataTableSearch] = useState([]);
   const [display, setDisplay] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("")
 
   const Toast = Swal.mixin({
     toast: true,
@@ -22,6 +24,7 @@ export default function DocumentLog(): JSX.Element {
     try {
       const response = await axios.get("/api/document-log");
       setDataTable(response.data.data);
+      setDataTableSearch(response.data.data);
     } catch (error: unknown) {
       console.error(error);
     }
@@ -109,10 +112,24 @@ export default function DocumentLog(): JSX.Element {
     }
   };
 
+  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value)
+    const dataTableSearchFilter = dataTable.filter((value: any) => {
+      const accountEmail = value.account_email ? value.account_email.toLowerCase() : ""
+      const accountStatus = value.status.toLowerCase()
+      return accountEmail.includes(event.target.value.toLowerCase()) || accountStatus.includes(event.target.value.toLowerCase())
+    })
+    if(event.target.value.length > 0){
+      setDataTableSearch(dataTableSearchFilter)
+    }else{
+      setDataTableSearch(dataTable)
+    }
+  }
+
   return status === "authenticated" ? (
     <main>
       <div className="flex flex-col md:flex-row gap-3 m-5">
-        <input className="input input-primary w-full md:w-fit md:flex-1" type="search" />
+        <input onChange={handleSearch} value={search} placeholder="Account or Status" className="input input-primary w-full md:w-fit md:flex-1" type="search" />
       </div>
       <div className="overflow-x-auto">
         <table className="table table-zebra table-auto">
@@ -129,8 +146,8 @@ export default function DocumentLog(): JSX.Element {
           </thead>
           <tbody>
             {/* body */}
-            {dataTable.length > 0 &&
-              dataTable.map((data: any) => {
+            {dataTableSearch.length > 0 &&
+              dataTableSearch.map((data: any) => {
                 return (
                   <tr key={data.id}>
                     {(data.status !== "PENDING") ? (
