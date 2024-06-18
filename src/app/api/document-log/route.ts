@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+
 import { NextResponse, NextRequest } from "next/server";
 
 const prisma: PrismaClient = new PrismaClient();
@@ -61,53 +62,71 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { id, email, notation } = await request.json();
-    const accountAdmin = await prisma.account_admin.findUnique({
-      select: { id: true },
-      where: { email: email },
-    });
-    if (notation) {
-      await prisma.document_log.update({
-        data: {
-          status: "REJECT",
-          notation: notation,
-          account_admin_id: accountAdmin?.id,
-        },
-        where: {
-          id: id
+    const debound = await prisma.document_log.findUnique({
+      select: {
+        account_id: true
+      },
+      where: {
+        id: id,
+        NOT: {
+          account_admin_id: null
         }
-      })
-    } else {
-      await prisma.document_log.update({
-        data: {
-          status: "APPROVE",
-          notation: "ยินดีต้อนรับ!! ท่านได้เป็นสมาชิกชมรม",
-          account_admin_id: accountAdmin?.id,
-        },
-        where: {
-          id: id
-        }
-      })
-      const documentLog = await prisma.document_log.findUnique({
-        select: {
-          account_id: true
-        },
-        where: {
-          id: id
-        }
-      })
-      await prisma.account.update({
-        data: {
-          role: "CERTIFIED"
-        },
-        where: {
-          id: documentLog?.account_id
-        }
-      })
+      }
+    })
+    if(debound){
+      return NextResponse.json(
+        { message: "POST Unsuccess", data: "" },
+        { status: 500 }
+      );
+    }else{
+      const accountAdmin = await prisma.account_admin.findUnique({
+        select: { id: true },
+        where: { email: email },
+      });
+      if (notation) {
+        await prisma.document_log.update({
+          data: {
+            status: "REJECT",
+            notation: notation,
+            account_admin_id: accountAdmin?.id,
+          },
+          where: {
+            id: id
+          }
+        })
+      } else {
+        await prisma.document_log.update({
+          data: {
+            status: "APPROVE",
+            notation: "ยินดีต้อนรับ!! ท่านได้เป็นสมาชิกชมรม",
+            account_admin_id: accountAdmin?.id,
+          },
+          where: {
+            id: id
+          }
+        })
+        const documentLog = await prisma.document_log.findUnique({
+          select: {
+            account_id: true
+          },
+          where: {
+            id: id
+          }
+        })
+        await prisma.account.update({
+          data: {
+            role: "CERTIFIED"
+          },
+          where: {
+            id: documentLog?.account_id
+          }
+        })
+      }
+      return NextResponse.json(
+        { message: "POST Success", data: "" },
+        { status: 200 }
+      );
     }
-    return NextResponse.json(
-      { message: "POST Success", data: "" },
-      { status: 200 }
-    );
   } catch (error: unknown) {
     console.log(error)
     return NextResponse.json(

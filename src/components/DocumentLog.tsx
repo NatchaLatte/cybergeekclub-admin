@@ -38,7 +38,7 @@ export default function DocumentLog(): JSX.Element {
     });
   };
 
-  const handleApprove = async (id: string) => {
+  const handleApprove = async (id: string, account_admin_id: string | null) => {
     Swal.fire({
       title: "Do you want to save the approve?",
       confirmButtonText: "Approve",
@@ -52,7 +52,7 @@ export default function DocumentLog(): JSX.Element {
           await axios.post("/api/document-log", {
             id: id,
             email: data.user.email,
-            notation: null,
+            notation: null
           });
           getData();
           await Toast.fire({
@@ -60,7 +60,8 @@ export default function DocumentLog(): JSX.Element {
             icon: "success",
           });
         } catch (error: unknown) {
-          Toast.fire({
+          getData();
+          await Toast.fire({
             title: "Approve faild.",
             icon: "error",
           });
@@ -71,7 +72,7 @@ export default function DocumentLog(): JSX.Element {
     });
   };
 
-  const handleReject = async (id: string) => {
+  const handleReject = async (id: string, account_admin_id: string | null) => {
     const { value: text } = await Swal.fire({
       title: "Notation",
       input: "textarea",
@@ -89,7 +90,7 @@ export default function DocumentLog(): JSX.Element {
         await axios.post("/api/document-log", {
           id: id,
           email: data.user.email,
-          notation: text,
+          notation: text
         });
         getData();
         await Toast.fire({
@@ -97,8 +98,8 @@ export default function DocumentLog(): JSX.Element {
           icon: "success",
         });
       } catch (error: unknown) {
-        console.log(error)
-        Toast.fire({
+        getData();
+        await Toast.fire({
           title: "Reject faild.",
           icon: "error",
         });
@@ -140,7 +141,7 @@ export default function DocumentLog(): JSX.Element {
                       <td className="flex flex-col md:flex-row gap-3 justify-center items-center">
                       <button
                         onClick={() => {
-                          handleApprove(data.id);
+                          handleApprove(data.id, data.account_admin_id);
                         }}
                         className="btn btn-success btn-xs w-full md:w-fit"
                       >
@@ -148,7 +149,7 @@ export default function DocumentLog(): JSX.Element {
                       </button>
                       <button
                         onClick={() => {
-                          handleReject(data.id);
+                          handleReject(data.id, data.account_admin_id);
                         }}
                         className="btn btn-error btn-xs w-full md:w-fit"
                       >
