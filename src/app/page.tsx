@@ -12,6 +12,7 @@ import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 
 export default function SignIn(): JSX.Element {
   const [account, setAccount] = useState<Account>({ email: "", password: "" });
+  const [signInText, setSignInText] = useState<boolean>(true);
   const [hidePassword, setHidePassword] = useState<boolean>(true);
   const { status } = useSession();
   const router = useRouter();
@@ -40,39 +41,48 @@ export default function SignIn(): JSX.Element {
 
   const handleSignIn = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
-    try {
-      if (
-        account.email.trim().length === 0 ||
-        account.password.trim().length === 0
-      ) {
-        Toast.fire({
-          title: "Email or password is blank.",
-          icon: "warning",
-        });
-      } else {
-        const result = await signIn("credentials", {
-          redirect: false,
-          email: account.email.trim(),
-          password: account.password.trim(),
-        });
-        if (result?.error) {
+    if(signInText){
+      setSignInText(false)
+      try {
+        if (
+          account.email.trim().length === 0 ||
+          account.password.trim().length === 0
+        ) {
           Toast.fire({
-            title: "Authentication is not valid.",
-            icon: "error",
+            title: "Email or password is blank.",
+            icon: "warning",
+          }).then(() => {
+            setSignInText(true)
           });
         } else {
-          Toast.fire({
-            title: "Authentication is valid.",
-            icon: "success",
+          const result = await signIn("credentials", {
+            redirect: false,
+            email: account.email.trim(),
+            password: account.password.trim(),
           });
-          router.push("/dashboard");
+          if (result?.error) {
+            Toast.fire({
+              title: "Authentication is not valid.",
+              icon: "error",
+            }).then(() => {
+              setSignInText(true)
+            });
+          } else {
+            Toast.fire({
+              title: "Authentication is valid.",
+              icon: "success",
+            }).then(() => {
+              setSignInText(true)
+            });
+            router.push("/dashboard");
+          }
         }
+      } catch (error) {
+        Toast.fire({
+          title: "Authentication is not valid.",
+          icon: "error",
+        });
       }
-    } catch (error) {
-      Toast.fire({
-        title: "Authentication is not valid.",
-        icon: "error",
-      });
     }
   };
 
@@ -127,7 +137,7 @@ export default function SignIn(): JSX.Element {
           </label>
           <div className="flex flex-col w-full border-opacity-50">
             <button type="submit" className="text-lg btn btn-primary">
-              Sign In
+              {signInText ? "Sign In" : <span className="loading loading-dots loading-lg"></span>}
             </button>
             {/* <div className="text-lg divider">OR</div>
           <Link

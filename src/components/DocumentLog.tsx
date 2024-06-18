@@ -105,6 +105,9 @@ export default function DocumentLog(): JSX.Element {
 
   return status === "authenticated" ? (
     <main>
+      <div className="flex flex-col md:flex-row gap-3 m-5">
+        <input className="input input-primary w-full md:w-fit md:flex-1" type="search" />
+      </div>
       <div className="overflow-x-auto">
         <table className="table table-zebra table-auto">
           {/* head */}
