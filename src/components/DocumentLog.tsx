@@ -47,7 +47,7 @@ export default function DocumentLog(): JSX.Element {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         try {
-          await axios.put("/api/document-log", {
+          await axios.post("/api/document-log", {
             id: id,
             email: data.user.email,
             notation: null,
@@ -92,6 +92,7 @@ export default function DocumentLog(): JSX.Element {
           icon: "success",
         });
       } catch (error: unknown) {
+        console.log(error)
         Toast.fire({
           title: "Reject faild.",
           icon: "error",

@@ -58,7 +58,7 @@ export async function GET() {
   }
 }
 
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const { id, email, notation } = await request.json();
     const accountAdmin = await prisma.account_admin.findUnique({
@@ -104,12 +104,13 @@ export async function PUT(request: NextRequest) {
       })
     }
     return NextResponse.json(
-      { message: "PUT Success", data: "" },
+      { message: "POST Success", data: "" },
       { status: 200 }
     );
   } catch (error: unknown) {
+    console.log(error)
     return NextResponse.json(
-      { message: "PUT Unsuccess", data: error },
+      { message: "POST Unsuccess", data: error },
       { status: 500 }
     );
   }
