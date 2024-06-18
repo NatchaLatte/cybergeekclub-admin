@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
       await prisma.document_log.update({
         data: {
           status: "APPROVE",
+          notation: "ยินดีต้อนรับ!! ท่านได้เป็นสมาชิกชมรม",
           account_admin_id: accountAdmin?.id,
         },
         where: {
