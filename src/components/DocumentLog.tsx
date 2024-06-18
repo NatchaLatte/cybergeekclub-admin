@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 export default function DocumentLog(): JSX.Element {
   const { data, status }: any = useSession();
   const [dataTable, setDataTable] = useState([]);
+  const [display, setDisplay] = useState<boolean>(false);
 
   const Toast = Swal.mixin({
     toast: true,
@@ -38,6 +39,7 @@ export default function DocumentLog(): JSX.Element {
   };
 
   const handleApprove = async (id: string) => {
+    setDisplay(true)
     Swal.fire({
       title: "Do you want to save the approve?",
       confirmButtonText: "Approve",
@@ -65,9 +67,11 @@ export default function DocumentLog(): JSX.Element {
         }
       }
     });
+    setDisplay(false)
   };
 
   const handleReject = async (id: string) => {
+    setDisplay(true)
     const { value: text } = await Swal.fire({
       title: "Notation",
       input: "textarea",
@@ -99,10 +103,8 @@ export default function DocumentLog(): JSX.Element {
         });
       }
     }
+    setDisplay(false)
   };
-
-  const a: string =
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur rerum eligendi doloremque cumque quae tempore, ipsum deserunt, temporibus fugiat magni eos velit nulla repellat consequuntur dignissimos aut excepturi aspernatur voluptates.";
 
   return status === "authenticated" ? (
     <main>
@@ -128,29 +130,29 @@ export default function DocumentLog(): JSX.Element {
               dataTable.map((data: any) => {
                 return (
                   <tr key={data.id}>
-                    {data.status === "PENDING" ? (
-                      <td className="flex flex-col md:flex-row gap-3 justify-center items-center">
-                        <button
-                          onClick={() => {
-                            handleApprove(data.id);
-                          }}
-                          className="btn btn-success btn-xs w-full md:w-fit"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => {
-                            handleReject(data.id);
-                          }}
-                          className="btn btn-error btn-xs w-full md:w-fit"
-                        >
-                          Reject
-                        </button>
+                    {(data.status !== "PENDING" || display) ? (
+                      <td className="text-center">
+                      {new Date(data.built).toLocaleString("th-TH")}
                       </td>
                     ) : (
-                      <td className="text-center">
-                        {new Date(data.built).toLocaleString("th-TH")}
-                      </td>
+                      <td className="flex flex-col md:flex-row gap-3 justify-center items-center">
+                      <button
+                        onClick={() => {
+                          handleApprove(data.id);
+                        }}
+                        className="btn btn-success btn-xs w-full md:w-fit"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleReject(data.id);
+                        }}
+                        className="btn btn-error btn-xs w-full md:w-fit"
+                      >
+                        Reject
+                      </button>
+                    </td>
                     )}
                     <td className="text-center">{data.account_email}</td>
                     <td className="text-center">
