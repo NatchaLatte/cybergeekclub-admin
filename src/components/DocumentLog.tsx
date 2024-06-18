@@ -81,7 +81,7 @@ export default function DocumentLog(): JSX.Element {
     });
     if (text) {
       try {
-        await axios.put("/api/document-log", {
+        await axios.post("/api/document-log", {
           id: id,
           email: data.user.email,
           notation: text,
