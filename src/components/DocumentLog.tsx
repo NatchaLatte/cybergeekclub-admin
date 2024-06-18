@@ -39,7 +39,6 @@ export default function DocumentLog(): JSX.Element {
   };
 
   const handleApprove = async (id: string) => {
-    setDisplay(true)
     Swal.fire({
       title: "Do you want to save the approve?",
       confirmButtonText: "Approve",
@@ -49,6 +48,7 @@ export default function DocumentLog(): JSX.Element {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         try {
+          setDisplay(true)
           await axios.post("/api/document-log", {
             id: id,
             email: data.user.email,
@@ -64,14 +64,14 @@ export default function DocumentLog(): JSX.Element {
             title: "Approve faild.",
             icon: "error",
           });
+        } finally {
+          setDisplay(false)
         }
       }
     });
-    setDisplay(false)
   };
 
   const handleReject = async (id: string) => {
-    setDisplay(true)
     const { value: text } = await Swal.fire({
       title: "Notation",
       input: "textarea",
@@ -85,6 +85,7 @@ export default function DocumentLog(): JSX.Element {
     });
     if (text) {
       try {
+        setDisplay(true)
         await axios.post("/api/document-log", {
           id: id,
           email: data.user.email,
@@ -101,9 +102,10 @@ export default function DocumentLog(): JSX.Element {
           title: "Reject faild.",
           icon: "error",
         });
+      } finally {
+        setDisplay(false)
       }
     }
-    setDisplay(false)
   };
 
   return status === "authenticated" ? (
@@ -130,11 +132,11 @@ export default function DocumentLog(): JSX.Element {
               dataTable.map((data: any) => {
                 return (
                   <tr key={data.id}>
-                    {(data.status !== "PENDING" || display) ? (
+                    {(data.status !== "PENDING") ? (
                       <td className="text-center">
                       {new Date(data.built).toLocaleString("th-TH")}
                       </td>
-                    ) : (
+                    ) : (display === true) ? <td className="text-center"><span className="loading loading-dots"></span></td> : (
                       <td className="flex flex-col md:flex-row gap-3 justify-center items-center">
                       <button
                         onClick={() => {
