@@ -290,7 +290,7 @@ export default function CorporateActivity(): JSX.Element {
                     <td className="text-center">{data.title_th}</td>
                     <td className="text-center">{data.title_en}</td>
                     <td className="text-center">
-                      <pre className="max-w-56 break-words whitespace-pre-wrap overflow-auto">
+                      <pre className="max-w-56 max-h-56 break-words whitespace-pre-wrap overflow-auto">
                         {data.particulars_th}
                       </pre>
                     </td>
