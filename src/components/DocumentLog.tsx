@@ -1,9 +1,11 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { FaSyncAlt } from "react-icons/fa";
+import moment from "moment-timezone";
 
 export default function DocumentLog(): JSX.Element {
   const { data, status }: any = useSession();
@@ -29,6 +31,7 @@ export default function DocumentLog(): JSX.Element {
       console.error(error);
     }
   };
+  
   useEffect(() => {
     getData();
   }, []);
@@ -126,10 +129,27 @@ export default function DocumentLog(): JSX.Element {
     }
   }
 
+  const handleSync = async () => {
+    try{
+      getData();
+      await Toast.fire({
+        title: "Sync success.",
+        icon: "success",
+      });
+    }catch(error: unknown){
+      console.error(error)
+      await Toast.fire({
+        title: "Sync faild.",
+        icon: "error",
+      });
+    }
+  }
+
   return status === "authenticated" ? (
     <main>
       <div className="flex flex-col md:flex-row gap-3 m-5">
         <input onChange={handleSearch} value={search} placeholder="Account or Status" className="input input-primary w-full md:w-fit md:flex-1" type="search" />
+        <button onClick={handleSync} className="btn btn-info w-full md:btn-wide"><FaSyncAlt /> Sync</button>
       </div>
       <div className="overflow-x-auto">
         <table className="table table-zebra table-auto">
@@ -152,7 +172,7 @@ export default function DocumentLog(): JSX.Element {
                   <tr key={data.id}>
                     {(data.status !== "PENDING") ? (
                       <td className="text-center">
-                      {new Date(data.built).toLocaleString("th-TH")}
+                      {moment.tz(data.built, "Asia/Bangkok").locale("th").format("L")}
                       </td>
                     ) : (display === true) ? <td className="text-center"><span className="loading loading-dots"></span></td> : (
                       <td className="flex flex-col md:flex-row gap-3 justify-center items-center">
