@@ -12,7 +12,7 @@ interface DashboardData {
     balanceAmount: number;
 }
 
-export async function GET() {
+export async function POST() {
     try {
         const accountAdminAmount = await prisma.account_admin.count()
         const accountMemberAmount = await prisma.account.count({

@@ -2,20 +2,16 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { DashboardData } from "@/utils/custom-type";
+import axios from "axios";
 
 export default function Dashboard(): JSX.Element {
   const { status }: any = useSession();
   const [dataTable, setDataTable] = useState<DashboardData>();
 
-  const init: RequestInit = {
-    method: "GET",
-  };
-
   const getData = async () => {
     try {
-      const response = await fetch("/api/dashboard", init);
-      const data = await response.json();
-      setDataTable(data.data);
+      const response = await axios.post("/api/dashboard");
+      setDataTable(response.data.data);
     } catch (error: unknown) {
       console.log(error);
     }
