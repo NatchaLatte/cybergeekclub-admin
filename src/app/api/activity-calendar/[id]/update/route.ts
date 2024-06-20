@@ -27,6 +27,9 @@ export async function POST(request: NextRequest) {
       })
       return NextResponse.json({ message: "PUT Success", data: updateData }, { status: 200 });
     }catch(error: unknown){
+      console.log(error)
       return NextResponse.json({ message: "PUT Unsuccess", data: error }, { status: 500 });
     }
   }
+
+  export const dynamic = "force-dynamic";

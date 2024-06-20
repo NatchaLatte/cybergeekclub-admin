@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 const prisma: PrismaClient = new PrismaClient();
 
-export async function POST() {
+export async function GET() {
   try{
     const readData = await prisma.activity_calendar.findMany({
       select: {
@@ -24,3 +24,5 @@ export async function POST() {
     return NextResponse.json({ message: "GET Unsuccess", data: error }, { status: 500 });
   }
 }
+
+export const dynamic = "force-dynamic";

@@ -6,7 +6,6 @@ const prisma: PrismaClient = new PrismaClient();
 export async function POST(request: NextRequest) {
   try{
     const { id } = await request.json()
-    console.log(id)
     const readData = await prisma.activity_calendar.findFirst({
         where: {
             id: id
@@ -14,6 +13,9 @@ export async function POST(request: NextRequest) {
     })
     return NextResponse.json({ message: "GET Success", data: readData}, { status: 200 });
   }catch(error: unknown){
+    console.log(error)
     return NextResponse.json({ message: "GET Unsuccess", data: error }, { status: 500 });
   }
 }
+
+export const dynamic = "force-dynamic";

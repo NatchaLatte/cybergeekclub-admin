@@ -10,7 +10,7 @@ export default function Dashboard(): JSX.Element {
 
   const getData = async () => {
     try {
-      const response = await axios.post("/api/dashboard");
+      const response = await axios.get("/api/dashboard");
       setDataTable(response.data.data);
     } catch (error: unknown) {
       console.log(error);

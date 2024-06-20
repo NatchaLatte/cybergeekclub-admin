@@ -25,7 +25,7 @@ export default function ActivityCalendar(): JSX.Element {
 
   const getData = async () => {
     try {
-      const response = await axios.post("/api/activity-calendar");
+      const response = await axios.get("/api/activity-calendar");
       setDataTable(response.data.data);
       setDataTableSearch(response.data.data);
     } catch (error: unknown) {

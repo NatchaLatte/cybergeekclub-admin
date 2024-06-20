@@ -12,7 +12,7 @@ interface DashboardData {
     balanceAmount: number;
 }
 
-export async function POST() {
+export async function GET() {
     try {
         const accountAdminAmount = await prisma.account_admin.count()
         const accountMemberAmount = await prisma.account.count({
@@ -51,3 +51,5 @@ export async function POST() {
         return NextResponse.json({ error: "Get data failed.", data: error }, { status: 500 })
     }
 }
+
+export const dynamic = "force-dynamic";

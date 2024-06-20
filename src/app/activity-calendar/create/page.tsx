@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import axios from "axios";
+import moment from "moment";
 
 interface RawData {
   particulars_th: string;
@@ -126,7 +127,7 @@ export default function CreateCorporateActivity(): JSX.Element {
             <span className="label-text">Start Period</span>
           </div>
           <input
-            value={(rawData.start_period || '').toString().substring(0, 16)}
+            value={moment(rawData.start_period).format().substring(0, 16)}
             onChange={setStartPeriod}
             type="datetime-local"
             className="input input-primary input-bordered w-full max-w-xs"
@@ -137,7 +138,7 @@ export default function CreateCorporateActivity(): JSX.Element {
             <span className="label-text">End Period</span>
           </div>
           <input
-            value={(rawData.end_period || '').toString().substring(0, 16)}
+            value={moment(rawData.end_period).format().substring(0, 16)}
             onChange={setEndPeriod}
             type="datetime-local"
             className="input input-primary input-bordered w-full max-w-xs"

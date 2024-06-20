@@ -26,3 +26,5 @@ export async function POST(request: Request) {
     return Response.json({ error: "Create account failed.", data: error }, { status: 500 });
   }
 }
+
+export const dynamic = "force-dynamic";
