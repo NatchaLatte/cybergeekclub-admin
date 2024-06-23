@@ -6,7 +6,7 @@ const prisma: PrismaClient = new PrismaClient();
 export async function POST(request: NextRequest) {
   try{
     const { id } = await request.json()
-    const readData = await prisma.activity_calendar.findFirst({
+    const readData = await prisma.corporate_activity.findFirst({
         where: {
             id: id
         }

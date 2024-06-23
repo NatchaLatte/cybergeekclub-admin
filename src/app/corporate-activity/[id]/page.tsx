@@ -1,8 +1,7 @@
 "use client";
-import { FormEvent, useEffect, useState, ReactEventHandler, EventHandler, SyntheticEvent } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useEffect, useState, SyntheticEvent } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { MdOutlineFileUpload } from "react-icons/md";
 import Swal from "sweetalert2";
 import axios from "axios";
 import moment from "moment-timezone";
@@ -10,6 +9,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 interface RawData {
+  id: string;
   banner_th: string;
   banner_en: string;
   title_th: string;
@@ -20,11 +20,13 @@ interface RawData {
   end_period: string;
 }
 
-export default function CreateCorporateActivity(): JSX.Element {
+export default function EditCorporateActivity(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
   const [switchLang, setSwitchLang] = useState<string>("TH");
+  const params = useParams<{ id: string }>();
   const [rawData, setRawData] = useState<RawData>({
+    id: "",
     banner_th: "",
     banner_en: "",
     title_th: "",
@@ -44,9 +46,24 @@ export default function CreateCorporateActivity(): JSX.Element {
     timerProgressBar: true,
   });
 
+  const getData = async () => {
+    try {
+      const response = await axios.post(`/api/corporate-activity/${params.id}`, {
+        id: params.id,
+      });
+      if (response.data) {
+        setRawData(response.data.data);
+      }
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
+    } else if (status === "authenticated") {
+      getData();
     }
   }, [status, router]);
 
@@ -58,7 +75,7 @@ export default function CreateCorporateActivity(): JSX.Element {
     event.preventDefault();
     if (!display) {
       Swal.fire({
-        title: "Do you want to the create?",
+        title: "Do you want to the update?",
         confirmButtonText: "Confirm",
         confirmButtonColor: "#00a96f",
         showCancelButton: true,
@@ -67,29 +84,20 @@ export default function CreateCorporateActivity(): JSX.Element {
         if (result.isConfirmed) {
           try {
             setDisplay(true);
-            await axios.post("/api/corporate-activity/create", rawData, {
+            await axios.post(`/api/corporate-activity/${params.id}/update`, rawData, {
               headers: {
                 "Content-Type": "multipart/form-data"
               }
             });
-            setRawData({
-              banner_th: "",
-              banner_en: "",
-              title_th: "",
-              title_en: "",
-              particulars_th: "",
-              particulars_en: "",
-              start_period: "",
-              end_period: "",
-            });
+            getData();
             await Toast.fire({
-              title: "Create success.",
+              title: "Update success.",
               icon: "success",
             });
           } catch (error: unknown) {
             console.error(error);
             await Toast.fire({
-              title: "Create faild.",
+              title: "Update faild.",
               icon: "error",
             });
           } finally {
@@ -135,14 +143,14 @@ export default function CreateCorporateActivity(): JSX.Element {
     setRawData({ ...rawData, end_period: end_period.target.value });
   };
 
-  const onImageError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = "https://placehold.co/512x512"
+  const onImageError = (e: SyntheticEvent<HTMLImageElement, Event>, rawData: any) => {
+    e.currentTarget.src = switchLang === "TH" ? rawData.banner_th: rawData.banner_en
   }
 
   return status === "authenticated" ? (
     <main className="flex flex-row h-screen justify-center items-center gap-5">
       <div className="flex flex-col">
-        <h1 className="text-3xl my-5 text-center">Create Corporate Activity</h1>
+        <h1 className="text-3xl my-5 text-center">Edit Corporate Activity</h1>
         <form
           onSubmit={handleSubmit}
           className="flex flex-row justify-center items-center gap-3"
@@ -245,7 +253,7 @@ export default function CreateCorporateActivity(): JSX.Element {
                 {display === true ? (
                   <span className="loading loading-dots"></span>
                 ) : (
-                  "Create"
+                  "Save"
                 )}
               </button>
               <button
@@ -274,7 +282,7 @@ export default function CreateCorporateActivity(): JSX.Element {
                   ? URL.createObjectURL(new Blob([rawData.banner_th]))
                   : URL.createObjectURL(new Blob([rawData.banner_en]))
               }
-              onError={onImageError}
+              onError={(event: SyntheticEvent<HTMLImageElement, Event>) => onImageError(event, rawData)}
               width={512}
               height={512}
               alt={switchLang === "TH" ? rawData.title_th : rawData.title_en}

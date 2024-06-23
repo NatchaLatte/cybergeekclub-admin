@@ -224,7 +224,7 @@ export default function CorporateActivity(): JSX.Element {
                     ) : (
                       <td className="flex flex-col md:flex-row gap-3 justify-center items-center h-96">
                         <button
-                          // onClick={() => handleEdit(data.id)}
+                          onClick={() => handleEdit(data.id)}
                           disabled={false}
                           className="btn btn-warning btn-xs w-full md:w-fit"
                         >
