@@ -64,6 +64,21 @@ export default function DocumentLog(): JSX.Element {
           await Toast.fire({
             title: "Approve success.",
             icon: "success",
+          }).then(async () => {
+            try{
+              await axios.post("/api/document-log/sendmail", {
+                id: id
+              });
+              await Toast.fire({
+                title: "SendMail success.",
+                icon: "success",
+              })
+            }catch(error){
+              await Toast.fire({
+                title: "SendMail faild.",
+                icon: "error",
+              })
+            }
           });
         } catch (error: unknown) {
           getData();
