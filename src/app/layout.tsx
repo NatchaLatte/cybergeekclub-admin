@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { getServerSession } from "next-auth";
 import SessionProvider from "@/components/SessionProvider";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const cybergeek = localFont({ src: "./K2D-Regular.ttf" });
 
@@ -20,7 +22,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body data-theme="cybergeek-dark" className={cybergeek.className}>
-        <SessionProvider session={session}>{children}</SessionProvider>
+        <SessionProvider session={session}>
+          {children}
+          <Analytics />
+          <SpeedInsights />
+        </SessionProvider>
       </body>
     </html>
   );
