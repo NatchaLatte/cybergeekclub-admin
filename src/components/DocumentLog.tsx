@@ -65,6 +65,7 @@ export default function DocumentLog(): JSX.Element {
             title: "Approve success.",
             icon: "success",
           }).then(async () => {
+            setDisplay(true)
             try{
               await axios.post("/api/document-log/sendmail", {
                 id: id
@@ -78,6 +79,8 @@ export default function DocumentLog(): JSX.Element {
                 title: "SendMail faild.",
                 icon: "error",
               })
+            } finally {
+              setDisplay(false)
             }
           });
         } catch (error: unknown) {
@@ -86,7 +89,6 @@ export default function DocumentLog(): JSX.Element {
             title: "Approve faild.",
             icon: "error",
           });
-        } finally {
           setDisplay(false)
         }
       }
