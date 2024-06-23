@@ -7,23 +7,25 @@ import axios from "axios";
 import moment from "moment";
 
 interface RawData {
-  id: string,
+  id: string;
+  category: string;
   particulars_th: string;
   particulars_en: string;
-  start_period: string;
-  end_period: string;
+  money: number;
+  time_series: string;
 }
 
-export default function EditActivityCalendar(): JSX.Element {
+export default function EditBudget(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [rawData, setRawData] = useState<RawData>({
     id: params.id,
+    category: "",
     particulars_th: "",
     particulars_en: "",
-    start_period: "",
-    end_period: "",
+    money: 0,
+    time_series: "",
   });
   const [display, setDisplay] = useState<boolean>(false);
 
@@ -37,10 +39,10 @@ export default function EditActivityCalendar(): JSX.Element {
 
   const getData = async () => {
     try {
-      const response = await axios.post(`/api/activity-calendar/${params.id}`, {
+      const response = await axios.post(`/api/budget/${params.id}`, {
         id: params.id,
       });
-      if(response.data){
+      if (response.data) {
         setRawData(response.data.data);
       }
     } catch (error: unknown) {
@@ -57,7 +59,7 @@ export default function EditActivityCalendar(): JSX.Element {
   }, [status, router]);
 
   const handleBack = () => {
-    router.push("/activity-calendar");
+    router.push("/budget");
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -73,7 +75,7 @@ export default function EditActivityCalendar(): JSX.Element {
         if (result.isConfirmed) {
           try {
             setDisplay(true);
-            await axios.post(`/api/activity-calendar/${params.id}/update`, rawData);
+            await axios.post(`/api/budget/${params.id}/update`, rawData);
             getData();
             await Toast.fire({
               title: "Update success.",
@@ -93,6 +95,10 @@ export default function EditActivityCalendar(): JSX.Element {
     }
   };
 
+  const setCategory = (category: any) => {
+    setRawData({ ...rawData, category: category.target.value });
+  };
+
   const setParticularsTH = (particulars_th: any) => {
     setRawData({ ...rawData, particulars_th: particulars_th.target.value });
   };
@@ -101,18 +107,19 @@ export default function EditActivityCalendar(): JSX.Element {
     setRawData({ ...rawData, particulars_en: particulars_en.target.value });
   };
 
-  const setStartPeriod = (start_period: any) => {
-    setRawData({ ...rawData, start_period: start_period.target.value });
+  const setMoney = (money: any) => {
+    setRawData({ ...rawData, money: Number.parseFloat(money.target.value) });
   };
 
-  const setEndPeriod = (end_period: any) => {
-    setRawData({ ...rawData, end_period: end_period.target.value });
+  const setTimeSeries = (time_series: any) => {
+    setRawData({ ...rawData, time_series: time_series.target.value });
   };
 
   return status === "authenticated" ? (
     <main className="flex flex-col h-screen justify-center items-center">
-      <h1 className="text-3xl">Edit Activity calendar</h1>
+      <h1 className="text-3xl">Edit Budget</h1>
       <form onSubmit={handleSubmit} className="flex flex-col">
+        <div className="flex gap-3">
         <label className="form-control w-full max-w-xs">
           <div className="label">
             <span className="label-text">{`Particulars (TH)`}</span>
@@ -135,28 +142,46 @@ export default function EditActivityCalendar(): JSX.Element {
             className="input input-primary input-bordered w-full max-w-xs"
           />
         </label>
+        </div>
+        <div className="flex gap-3">
         <label className="form-control w-full max-w-xs">
           <div className="label">
-            <span className="label-text">Start Period</span>
+            <span className="label-text">Category</span>
           </div>
-          <input
-            value={moment(rawData.start_period).format().substring(0, 16)}
-            onChange={setStartPeriod}
-            type="datetime-local"
-            className="input input-primary input-bordered w-full max-w-xs"
-          />
+          <select
+            value={rawData.category}
+            onChange={setCategory}
+            className="select select-primary select-bordered"
+          >
+            <option value="">ไม่เลือกหมวดหมู่</option>
+            <option value="INCOME">INCOME</option>
+            <option value="SUBSIDY">SUBSIDY</option>
+          </select>
         </label>
         <label className="form-control w-full max-w-xs">
           <div className="label">
-            <span className="label-text">End Period</span>
+            <span className="label-text">Money</span>
           </div>
           <input
-          value={moment(rawData.end_period).format().substring(0, 16)}
-            onChange={setEndPeriod}
-            type="datetime-local"
+            value={rawData.money ? rawData.money : 0}
+            onChange={setMoney}
+            type="number"
             className="input input-primary input-bordered w-full max-w-xs"
           />
         </label>
+        </div>
+        <label className="form-control w-full">
+          <div className="label">
+            <span className="label-text">Time Series</span>
+          </div>
+          <input
+            value={moment(rawData.time_series).format().substring(0, 16)}
+            onChange={setTimeSeries}
+            type="datetime-local"
+            className="input input-primary input-bordered w-full"
+          />
+        </label>
+        <div className="flex gap-3">
         <button type="submit" className="btn btn-primary btn-wide mt-3">
           {display === true ? (
             <span className="loading loading-dots"></span>
@@ -171,6 +196,7 @@ export default function EditActivityCalendar(): JSX.Element {
         >
           Back
         </button>
+        </div>
       </form>
     </main>
   ) : (

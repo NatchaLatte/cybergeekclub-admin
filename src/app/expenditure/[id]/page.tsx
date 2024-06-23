@@ -1,26 +1,29 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import moment from "moment";
 
 interface RawData {
+  id: string;
   particulars_th: string;
   particulars_en: string;
-  start_period: string;
-  end_period: string;
+  money: number;
+  time_series: string;
 }
 
-export default function CreateActivityCalendar(): JSX.Element {
+export default function EditExpenditure(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
+  const params = useParams<{ id: string }>();
   const [rawData, setRawData] = useState<RawData>({
+    id: params.id,
     particulars_th: "",
     particulars_en: "",
-    start_period: "",
-    end_period: "",
+    money: 0,
+    time_series: "",
   });
   const [display, setDisplay] = useState<boolean>(false);
 
@@ -32,51 +35,61 @@ export default function CreateActivityCalendar(): JSX.Element {
     timerProgressBar: true,
   });
 
+  const getData = async () => {
+    try {
+      const response = await axios.post(`/api/expenditure/${params.id}`, {
+        id: params.id,
+      });
+      if (response.data) {
+        setRawData(response.data.data);
+      }
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
+    } else if (status === "authenticated") {
+      getData();
     }
   }, [status, router]);
 
   const handleBack = () => {
-    router.push("/activity-calendar");
+    router.push("/expenditure");
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if(!display){
-        Swal.fire({
-            title: "Do you want to the create?",
-            confirmButtonText: "Confirm",
-            confirmButtonColor: "#00a96f",
-            showCancelButton: true,
-          }).then(async (result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-              try {
-                setDisplay(true);
-                await axios.post("/api/activity-calendar/create", rawData);
-                setRawData({
-                    particulars_th: "",
-                    particulars_en: "",
-                    start_period: "",
-                    end_period: "",
-                  })
-                await Toast.fire({
-                  title: "Create success.",
-                  icon: "success",
-                });
-              } catch (error: unknown) {
-                console.error(error);
-                await Toast.fire({
-                  title: "Create faild.",
-                  icon: "error",
-                });
-              } finally {
-                setDisplay(false);
-              }
-            }
-          });
+    if (!display) {
+      Swal.fire({
+        title: "Do you want to the create?",
+        confirmButtonText: "Confirm",
+        confirmButtonColor: "#00a96f",
+        showCancelButton: true,
+      }).then(async (result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          try {
+            setDisplay(true);
+            await axios.post(`/api/expenditure/${params.id}/update`, rawData);
+            getData();
+            await Toast.fire({
+              title: "Update success.",
+              icon: "success",
+            });
+          } catch (error: unknown) {
+            console.error(error);
+            await Toast.fire({
+              title: "Update faild.",
+              icon: "error",
+            });
+          } finally {
+            setDisplay(false);
+          }
+        }
+      });
     }
   };
 
@@ -88,24 +101,25 @@ export default function CreateActivityCalendar(): JSX.Element {
     setRawData({ ...rawData, particulars_en: particulars_en.target.value });
   };
 
-  const setStartPeriod = (start_period: any) => {
-    setRawData({ ...rawData, start_period: start_period.target.value });
+  const setMoney = (money: any) => {
+    setRawData({ ...rawData, money: Number.parseFloat(money.target.value) });
   };
 
-  const setEndPeriod = (end_period: any) => {
-    setRawData({ ...rawData, end_period: end_period.target.value });
+  const setTimeSeries = (time_series: any) => {
+    setRawData({ ...rawData, time_series: time_series.target.value });
   };
 
   return status === "authenticated" ? (
     <main className="flex flex-col h-screen justify-center items-center">
-      <h1 className="text-3xl">Create Activity calendar</h1>
+      <h1 className="text-3xl">Edit Expenditure</h1>
       <form onSubmit={handleSubmit} className="flex flex-col">
+        <div className="flex gap-3">
         <label className="form-control w-full max-w-xs">
           <div className="label">
             <span className="label-text">{`Particulars (TH)`}</span>
           </div>
           <input
-            value={rawData.particulars_th}
+            value={rawData.particulars_th ? rawData.particulars_th : ""}
             onChange={setParticularsTH}
             type="text"
             className="input input-primary input-bordered w-full max-w-xs"
@@ -116,36 +130,44 @@ export default function CreateActivityCalendar(): JSX.Element {
             <span className="label-text">{`Particulars (EN)`}</span>
           </div>
           <input
-            value={rawData.particulars_en}
+            value={rawData.particulars_en ? rawData.particulars_en : ""}
             onChange={setParticularsEN}
             type="text"
             className="input input-primary input-bordered w-full max-w-xs"
           />
         </label>
+        </div>
+        <div className="flex gap-3">
         <label className="form-control w-full max-w-xs">
           <div className="label">
-            <span className="label-text">Start Period</span>
+            <span className="label-text">Money</span>
           </div>
           <input
-            value={moment(rawData.start_period).format().substring(0, 16)}
-            onChange={setStartPeriod}
-            type="datetime-local"
+            value={rawData.money ? rawData.money : 0}
+            onChange={setMoney}
+            type="number"
             className="input input-primary input-bordered w-full max-w-xs"
           />
         </label>
         <label className="form-control w-full max-w-xs">
           <div className="label">
-            <span className="label-text">End Period</span>
+            <span className="label-text">Time Series</span>
           </div>
           <input
-            value={moment(rawData.end_period).format().substring(0, 16)}
-            onChange={setEndPeriod}
+            value={moment(rawData.time_series).format().substring(0, 16)}
+            onChange={setTimeSeries}
             type="datetime-local"
             className="input input-primary input-bordered w-full max-w-xs"
           />
         </label>
+        </div>
+        <div className="flex gap-3">
         <button type="submit" className="btn btn-primary btn-wide mt-3">
-        {display === true ? (<span className="loading loading-dots"></span>) : "Create"}
+          {display === true ? (
+            <span className="loading loading-dots"></span>
+          ) : (
+            "Save"
+          )}
         </button>
         <button
           type="button"
@@ -154,6 +176,7 @@ export default function CreateActivityCalendar(): JSX.Element {
         >
           Back
         </button>
+        </div>
       </form>
     </main>
   ) : (

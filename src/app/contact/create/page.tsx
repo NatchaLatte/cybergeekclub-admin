@@ -7,21 +7,21 @@ import axios from "axios";
 import moment from "moment";
 
 interface RawData {
-  particulars_th: string;
-  particulars_en: string;
-  start_period: string;
-  end_period: string;
+  category: string;
+  display_name: string;
+  uri: string;
 }
 
-export default function CreateActivityCalendar(): JSX.Element {
+
+export default function CreateContact(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
   const [rawData, setRawData] = useState<RawData>({
-    particulars_th: "",
-    particulars_en: "",
-    start_period: "",
-    end_period: "",
+    category: "",
+    display_name: "",
+    uri: "",
   });
+
   const [display, setDisplay] = useState<boolean>(false);
 
   const Toast = Swal.mixin({
@@ -39,7 +39,7 @@ export default function CreateActivityCalendar(): JSX.Element {
   }, [status, router]);
 
   const handleBack = () => {
-    router.push("/activity-calendar");
+    router.push("/contact");
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -55,13 +55,12 @@ export default function CreateActivityCalendar(): JSX.Element {
             if (result.isConfirmed) {
               try {
                 setDisplay(true);
-                await axios.post("/api/activity-calendar/create", rawData);
+                await axios.post("/api/contact/create", rawData);
                 setRawData({
-                    particulars_th: "",
-                    particulars_en: "",
-                    start_period: "",
-                    end_period: "",
-                  })
+                  category: "",
+                  display_name: "",
+                  uri: "",
+                })
                 await Toast.fire({
                   title: "Create success.",
                   icon: "success",
@@ -80,72 +79,67 @@ export default function CreateActivityCalendar(): JSX.Element {
     }
   };
 
-  const setParticularsTH = (particulars_th: any) => {
-    setRawData({ ...rawData, particulars_th: particulars_th.target.value });
+  const setCategory = (category: any) => {
+    setRawData({ ...rawData, category: category.target.value });
   };
 
-  const setParticularsEN = (particulars_en: any) => {
-    setRawData({ ...rawData, particulars_en: particulars_en.target.value });
+  const setDisplayName = (display_name: any) => {
+    setRawData({ ...rawData, display_name: display_name.target.value });
   };
 
-  const setStartPeriod = (start_period: any) => {
-    setRawData({ ...rawData, start_period: start_period.target.value });
-  };
-
-  const setEndPeriod = (end_period: any) => {
-    setRawData({ ...rawData, end_period: end_period.target.value });
+  const setURI = (uri: any) => {
+    setRawData({ ...rawData, uri: uri.target.value });
   };
 
   return status === "authenticated" ? (
     <main className="flex flex-col h-screen justify-center items-center">
-      <h1 className="text-3xl">Create Activity calendar</h1>
+      <h1 className="text-3xl">Create Contact</h1>
       <form onSubmit={handleSubmit} className="flex flex-col">
-        <label className="form-control w-full max-w-xs">
+        <label className="form-control w-full">
           <div className="label">
-            <span className="label-text">{`Particulars (TH)`}</span>
+            <span className="label-text">Display Name</span>
           </div>
           <input
-            value={rawData.particulars_th}
-            onChange={setParticularsTH}
+            value={rawData.display_name}
+            onChange={setDisplayName}
             type="text"
-            className="input input-primary input-bordered w-full max-w-xs"
+            className="input input-primary input-bordered w-full"
           />
         </label>
-        <label className="form-control w-full max-w-xs">
+        <label className="form-control w-full">
           <div className="label">
-            <span className="label-text">{`Particulars (EN)`}</span>
+            <span className="label-text">URI</span>
           </div>
           <input
-            value={rawData.particulars_en}
-            onChange={setParticularsEN}
-            type="text"
-            className="input input-primary input-bordered w-full max-w-xs"
+            value={rawData.uri}
+            onChange={setURI}
+            type="url"
+            className="input input-primary input-bordered w-full"
           />
         </label>
-        <label className="form-control w-full max-w-xs">
+        <label className="form-control w-full">
           <div className="label">
-            <span className="label-text">Start Period</span>
+            <span className="label-text">Category</span>
           </div>
-          <input
-            value={moment(rawData.start_period).format().substring(0, 16)}
-            onChange={setStartPeriod}
-            type="datetime-local"
-            className="input input-primary input-bordered w-full max-w-xs"
-          />
+          <select
+            value={rawData.category}
+            onChange={setCategory}
+            className="select select-primary select-bordered"
+          >
+            <option value="">ไม่เลือกหมวดหมู่</option>
+            <option value="FACEBOOK">FACEBOOK</option>
+            <option value="INSTAGRAM">INSTAGRAM</option>
+            <option value="YOUTUBE">YOUTUBE</option>
+            <option value="DISCORD">DISCORD</option>
+          </select>
         </label>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">End Period</span>
-          </div>
-          <input
-            value={moment(rawData.end_period).format().substring(0, 16)}
-            onChange={setEndPeriod}
-            type="datetime-local"
-            className="input input-primary input-bordered w-full max-w-xs"
-          />
-        </label>
+        <div className="flex gap-3">
         <button type="submit" className="btn btn-primary btn-wide mt-3">
-        {display === true ? (<span className="loading loading-dots"></span>) : "Create"}
+          {display === true ? (
+            <span className="loading loading-dots"></span>
+          ) : (
+            "Create"
+          )}
         </button>
         <button
           type="button"
@@ -154,6 +148,7 @@ export default function CreateActivityCalendar(): JSX.Element {
         >
           Back
         </button>
+        </div>
       </form>
     </main>
   ) : (
