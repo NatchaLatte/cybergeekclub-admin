@@ -147,7 +147,7 @@ export default function CreateNews(): JSX.Element {
             <div className="flex gap-3">
               <label className="form-control w-full max-w-xs">
                 <div className="label">
-                  <span className="label-text">{`Title (TH)`}</span>
+                  <span className="label-text">{`Banner (TH)`}</span>
                 </div>
                 <input
                   onChange={setBannerTH}
@@ -157,7 +157,7 @@ export default function CreateNews(): JSX.Element {
               </label>
               <label className="form-control w-full max-w-xs">
                 <div className="label">
-                  <span className="label-text">{`Title (EN)`}</span>
+                  <span className="label-text">{`Banner (EN)`}</span>
                 </div>
                 <input
                   onChange={setBannerEN}
