@@ -295,7 +295,11 @@ export default function CorporateActivity(): JSX.Element {
                         {data.particulars_th}
                       </pre>
                     </td>
-                    <td className="text-center">{data.particulars_en}</td>
+                    <td className="text-center">
+                    <pre className="max-w-56 max-h-56 break-words whitespace-pre-wrap overflow-auto">
+                        {data.particulars_en}
+                      </pre>
+                    </td>
                     <td className="text-center">
                       {data.start_period
                         ? moment
