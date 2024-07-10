@@ -14,7 +14,7 @@ interface RawData {
   end_period: string;
 }
 
-export default function CreateCorporateActivity(): JSX.Element {
+export default function EditActivityCalendar(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
   const params = useParams<{ id: string }>();

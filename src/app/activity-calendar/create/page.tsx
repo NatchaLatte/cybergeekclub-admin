@@ -13,7 +13,7 @@ interface RawData {
   end_period: string;
 }
 
-export default function CreateCorporateActivity(): JSX.Element {
+export default function CreateActivityCalendar(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
   const [rawData, setRawData] = useState<RawData>({

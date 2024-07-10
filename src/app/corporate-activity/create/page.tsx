@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, ReactEventHandler, EventHandler, SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { MdOutlineFileUpload } from "react-icons/md";
@@ -134,6 +134,11 @@ export default function CreateCorporateActivity(): JSX.Element {
   const setEndPeriod = (end_period: any) => {
     setRawData({ ...rawData, end_period: end_period.target.value });
   };
+
+  const onImageError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = "https://placehold.co/512x512"
+  }
+
   return status === "authenticated" ? (
     <main className="flex flex-row h-screen justify-center items-center gap-5">
       <div className="flex flex-col">
@@ -146,7 +151,7 @@ export default function CreateCorporateActivity(): JSX.Element {
             <div className="flex gap-3">
               <label className="form-control w-full max-w-xs">
                 <div className="label">
-                  <span className="label-text">{`Title (TH)`}</span>
+                  <span className="label-text">{`Banner (TH)`}</span>
                 </div>
                 <input
                   onChange={setBannerTH}
@@ -156,7 +161,7 @@ export default function CreateCorporateActivity(): JSX.Element {
               </label>
               <label className="form-control w-full max-w-xs">
                 <div className="label">
-                  <span className="label-text">{`Title (EN)`}</span>
+                  <span className="label-text">{`Banner (EN)`}</span>
                 </div>
                 <input
                   onChange={setBannerEN}
@@ -269,6 +274,7 @@ export default function CreateCorporateActivity(): JSX.Element {
                   ? URL.createObjectURL(new Blob([rawData.banner_th]))
                   : URL.createObjectURL(new Blob([rawData.banner_en]))
               }
+              onError={onImageError}
               width={512}
               height={512}
               alt={switchLang === "TH" ? rawData.title_th : rawData.title_en}

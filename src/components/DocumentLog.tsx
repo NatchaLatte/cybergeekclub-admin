@@ -12,6 +12,7 @@ export default function DocumentLog(): JSX.Element {
   const [dataTable, setDataTable] = useState([]);
   const [dataTableSearch, setDataTableSearch] = useState([]);
   const [display, setDisplay] = useState<boolean>(false);
+  const [displaySendMail, setDisplaySendMail] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("")
 
   const Toast = Swal.mixin({
@@ -55,6 +56,7 @@ export default function DocumentLog(): JSX.Element {
       if (result.isConfirmed) {
         try {
           setDisplay(true)
+          setDisplaySendMail(true)
           await axios.post("/api/document-log", {
             id: id,
             email: data.user.email,
@@ -64,6 +66,23 @@ export default function DocumentLog(): JSX.Element {
           await Toast.fire({
             title: "Approve success.",
             icon: "success",
+          }).then(async () => {
+            try{
+              await axios.post("/api/document-log/sendmail", {
+                id: id
+              });
+              await Toast.fire({
+                title: "SendMail success.",
+                icon: "success",
+              })
+            }catch(error){
+              await Toast.fire({
+                title: "SendMail faild.",
+                icon: "error",
+              })
+            } finally {
+              setDisplaySendMail(false)
+            }
           });
         } catch (error: unknown) {
           getData();
@@ -71,7 +90,7 @@ export default function DocumentLog(): JSX.Element {
             title: "Approve faild.",
             icon: "error",
           });
-        } finally {
+        }finally {
           setDisplay(false)
         }
       }
@@ -170,11 +189,11 @@ export default function DocumentLog(): JSX.Element {
               dataTableSearch.map((data: any) => {
                 return (
                   <tr key={data.id}>
-                    {(data.status !== "PENDING") ? (
+                    {(data.status !== "PENDING" && displaySendMail === false) ? (
                       <td className="text-center">
                       {moment.tz(data.built, "Asia/Bangkok").locale("th").format("L")}
                       </td>
-                    ) : (display === true) ? <td className="text-center"><span className="loading loading-dots"></span></td> : (
+                    ) : (display === true || displaySendMail === true) ? <td className="text-center"><span className="loading loading-dots"></span></td> : (
                       <td className="flex flex-col md:flex-row gap-3 justify-center items-center">
                       <button
                         onClick={() => {

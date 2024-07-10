@@ -1,4 +1,4 @@
-import { PrismaClient, corporate_activity } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 import { v4 } from "uuid";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";

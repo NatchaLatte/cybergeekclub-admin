@@ -224,7 +224,7 @@ export default function CorporateActivity(): JSX.Element {
                     ) : (
                       <td className="flex flex-col md:flex-row gap-3 justify-center items-center h-96">
                         <button
-                          // onClick={() => handleEdit(data.id)}
+                          onClick={() => handleEdit(data.id)}
                           disabled={false}
                           className="btn btn-warning btn-xs w-full md:w-fit"
                         >
@@ -295,7 +295,11 @@ export default function CorporateActivity(): JSX.Element {
                         {data.particulars_th}
                       </pre>
                     </td>
-                    <td className="text-center">{data.particulars_en}</td>
+                    <td className="text-center">
+                    <pre className="max-w-56 max-h-56 break-words whitespace-pre-wrap overflow-auto">
+                        {data.particulars_en}
+                      </pre>
+                    </td>
                     <td className="text-center">
                       {data.start_period
                         ? moment

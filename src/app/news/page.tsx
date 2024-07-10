@@ -2,7 +2,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AiFillDashboard } from "react-icons/ai";
 import { RiLogoutBoxFill } from "react-icons/ri";
 import {
