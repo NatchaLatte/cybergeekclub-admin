@@ -40,7 +40,11 @@ export async function POST(request: NextRequest) {
           from: `"CyberGeekClub" ${SIMPLE_MAIL_TRANSFER_PROTOCOL_USERNAME}`,
           to: `${accountEmail?.email}`,
           subject: `[CyberGeekClub] ยินดีต้อนรับ!! ท่านได้เป็นสมาชิกชมรม`,
-          text: `ท่านได้เป็นสมาชิกชมรม CyberGeekClub สามารถตรวจสอบข้อมูล ข่าวส่ารต่าง ๆ ได้ทางเว็บไซต์`,
+          // text: `ท่านได้เป็นสมาชิกชมรม CyberGeekClub สามารถตรวจสอบข้อมูล ข่าวส่ารต่าง ๆ ได้ทางเว็บไซต์`,
+          html: `<p>คุณสามารถเข้าร่วมเป็นส่วนหนึ่งของกลุ่มไลน์ได้ที่</p>
+<img src="https://cybergeek-club-bucket.s3.ap-southeast-1.amazonaws.com/asset/image/Line/LineQrCode.jpg"/></br>
+<p>ลิงก์กลุ่มไลน์: <a href="https://line.me/ti/g2/ldawOXAQHDbvIM0KFvGZtQOY9rw9gFAPKbcWDg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default">https://line.me/ti/g2/ldawOXAQHDbvIM0KFvGZtQOY9rw9gFAPKbcWDg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default</a></br></p>
+<p>รหัสผ่าน: KUsrc</p>`,
         };
         await transporter.sendMail(mailOptions);
         return NextResponse.json(
