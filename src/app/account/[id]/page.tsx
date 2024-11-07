@@ -15,12 +15,66 @@ import {
   code,
 } from "@/utils/custom-type";
 
+interface RawData {
+  id: string;
+  email: string;
+  role: string;
+  point: string;
+  banned: string;
+  remaining_time: string;
+  birthdate: string;
+  code: string;
+  profile_image: string;
+  display_name: string;
+  student_id: string;
+  nickname_en: string;
+  prefix_en: string;
+  first_name_en: string;
+  middle_name_en: string;
+  last_name_en: string;
+  faculty_en: string;
+  major_en: string;
+  nickname_th: string;
+  prefix_th: string;
+  first_name_th: string;
+  middle_name_th: string;
+  last_name_th: string;
+  faculty_th: string;
+  major_th: string;
+}
+
 export default function EditAccount(): JSX.Element {
   const { status }: any = useSession();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState<any>();
-
+  const [rawData, setRawData] = useState<RawData>({
+    id: "",
+    email: "",
+    role: "",
+    point: "",
+    banned: "",
+    remaining_time: "",
+    birthdate: "",
+    code: "",
+    profile_image: "",
+    display_name: "",
+    student_id: "",
+    nickname_en: "",
+    prefix_en: "",
+    first_name_en: "",
+    middle_name_en: "",
+    last_name_en: "",
+    faculty_en: "",
+    major_en: "",
+    nickname_th: "",
+    prefix_th: "",
+    first_name_th: "",
+    middle_name_th: "",
+    last_name_th: "",
+    faculty_th: "",
+    major_th: ""
+  });
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -33,6 +87,9 @@ export default function EditAccount(): JSX.Element {
     try {
       const response = await axios.get(`/api/account/${params.id}`);
       console.log(response.data.data);
+      if (response.data) {
+        setRawData(response.data.data);
+      }
       Toast.fire({
         title: `${response.data.message}`,
         icon: "success",
@@ -93,6 +150,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{"Student ID"}</span>
               </div>
               <input
+                value={rawData.student_id}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -135,6 +193,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`First Name (TH)`}</span>
               </div>
               <input
+                value={rawData.first_name_th}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -145,6 +204,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`First Name (EN)`}</span>
               </div>
               <input
+                value={rawData.first_name_en}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -157,6 +217,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`Middle Name (TH)`}</span>
               </div>
               <input
+                value={rawData.middle_name_th}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -167,6 +228,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`Middle Name (EN)`}</span>
               </div>
               <input
+                value={rawData.middle_name_en}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -179,6 +241,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`Last Name (TH)`}</span>
               </div>
               <input
+                value={rawData.last_name_th}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -189,6 +252,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`Last Name (EN)`}</span>
               </div>
               <input
+                value={rawData.last_name_en}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -201,6 +265,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`Nickname (TH)`}</span>
               </div>
               <input
+                value={rawData.nickname_th}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -211,6 +276,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{`Nickname (EN)`}</span>
               </div>
               <input
+                value={rawData.nickname_en}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -235,6 +301,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{"Point"}</span>
               </div>
               <input
+                value={rawData.point}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
@@ -321,6 +388,7 @@ export default function EditAccount(): JSX.Element {
                 <span className="label-text">{"Display Name"}</span>
               </div>
               <input
+                value={rawData.display_name}
                 type="text"
                 placeholder=""
                 className="input input-primary input-bordered w-full"
